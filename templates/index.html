@@ -5,41 +5,124 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trợ lý ảo</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="icon" href="/static/favicon.png" />
+    <link rel="stylesheet" type="text/css" href="/static/style2.css">
+    <script src="/static/jquery.min.js"></script>
   </head>
   <body>
-    <h1>Flask Chatterbot Example</h1>
-    <h3>A web implementation of <a href="https://github.com/gunthercox/ChatterBot">ChatterBot</a> using Flask.</h3>
+    <h1>Trợ Lý Ảo</h1>
     <div>
       <div id="chatbox">
-        <p class="botText"><span>Hi! I'm Chatterbot.</span></p>
+        <p class="botText"><span>Hi! I'm Chatbot.</span></p>
       </div>
       <div id="userInput">
         <input id="textInput" type="text" name="msg" placeholder="Message">
         <input id="buttonInput" type="submit" value="Send">
       </div>
       <script>
+        
+        var yeucau=0;
+
+        var arr = [];
+
         function getBotResponse() {
+          
           var rawText = $("#textInput").val();
+
           var userHtml = '<p class="userText"><span>' + rawText + '</span></p>';
-          $("#textInput").val("");
-          $("#chatbox").append(userHtml);
-          document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
-          $.get("/get", { msg: rawText }).done(function(data) {
-            var botHtml = '<p class="botText"><span>' + data + '</span></p>';
-            $("#chatbox").append(botHtml);
+
+          if(yeucau == 1){
+
+            arr.push($("#textInput").val());
+
+            Html = '<p class="userText"><span>' + arr[0] + '</span></p>';
+
+            $("#chatbox").append(Html);
+
+            $.get("/get", { msg: arr[0],yeucau:"1"}).done(function(data) {
+            
+            });
+
+            yeucau = 0;
+
+            arr.shift();
+              
+            $("#textInput").val("");
+
+          }
+          
+          else if(yeucau == 2 ){
+
+            arr.push($("#textInput").val());
+
+            Html = '<p class="userText"><span>' + arr[0] + '</span></p>';
+
+            $("#chatbox").append(Html);
+
+            $.get("/get", { msg: arr[0],yeucau:"2"}).done(function(data) {
+
+              var botHtml = '<p class="botText"><span>' + data + '</span></p>';
+
+              $("#chatbox").append(botHtml);
+
+              document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+            
+            });
+
+            yeucau = 0;
+
+            arr.shift();
+              
+            $("#textInput").val("");
+
+          }
+
+          else{
+
+            $("#textInput").val("");
+
+            $("#chatbox").append(userHtml);
+
             document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
-          });
+
+            $.get("/get", { msg: rawText,yeucau:false }).done(function(data) {
+              
+              var botHtml = '<p class="botText"><span>' + data + '</span></p>';
+
+              $("#chatbox").append(botHtml);
+
+              document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+
+              if(data == "nội dung cần tìm kiếm"){
+                yeucau = 1;
+              }
+              
+              else if(data == "tên thành phố bạn muốn xem"){
+                yeucau = 2;
+              }
+
+            });
+
+          }
+
         }
+
         $("#textInput").keypress(function(e) {
-            if(e.which == 13) {
-                getBotResponse();
-            }
+          
+          if(e.which == 13) {
+
+            getBotResponse();
+
+          }
+
         });
+
         $("#buttonInput").click(function() {
+
           getBotResponse();
+
         })
+ 
       </script>
     </div>
   </body>
